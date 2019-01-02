@@ -1,0 +1,12 @@
+syntax = 'proto3';
+
+package proto;
+
+import "message.proto";
+
+service KvStore {
+   rpc Get(Key) returns(GetResponse){}
+   rpc Scan(Key) returns(stream KVPair) {}
+   rpc Put(KVPair) returns(BaseResponse) {}
+   rpc Del(Key) returns(BaseResponse) {}
+}

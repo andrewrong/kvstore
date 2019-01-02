@@ -1,0 +1,26 @@
+syntax = 'proto3';
+
+package proto;
+
+message Key {
+    string key = 1;
+}
+
+message Value {
+    string value = 1;
+}
+
+message KVPair {
+    Key kkey = 1;
+    Value vvalue = 2;
+}
+
+message BaseResponse {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message GetResponse {
+    BaseResponse status = 1;
+    Value value = 2;
+}
