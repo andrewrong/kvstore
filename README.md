@@ -23,6 +23,21 @@
    * 存储层: 用rocksdb来搞定存储的; 关于有序,rocksdb本身能保证
    * 网络层: 直接用grpc
 
+### 5. 目录
+
+    client: 客户端代码
+    src: 服务端代码
+    test: 测试代码
+
+### 6. 编译
+
+    * grpc
+    * gtest
+    * rocksdb
+
+    需要编译; 如果编译目录不一样的话，可能需要修改一下cmakelists.txt
+
+
 
 
 

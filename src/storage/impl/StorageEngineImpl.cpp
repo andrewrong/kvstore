@@ -16,6 +16,7 @@ storage::StorageEngineImpl::StorageEngineImpl(const string& dbPath) {
     options.IncreaseParallelism();
     options.OptimizeLevelStyleCompaction();
     options.create_if_missing = true;
+    options.prefix_extractor = nullptr;
 
     status = rocksdb::DB::Open(options, dbPath, &db_);
     if(!status.ok()) {
@@ -113,7 +114,7 @@ storage::Status storage::StorageEngineImpl::Scan(const std::string &prefixKey,
         return std::make_pair(code, CodeMsg[code]);
     }
 
-    rocksdb::Iterator* iterator = db_->NewIterator(rocksdb::ReadOptions());
+    storage::IteratorPtr iterator = NewIterator();
     if (!iterator) {
         fprintf(stderr, "iterator is null");
         int code = static_cast<int>(Code::eInnerUnknownError);
@@ -122,13 +123,13 @@ storage::Status storage::StorageEngineImpl::Scan(const std::string &prefixKey,
 
     int limit = 0;
     if(prefixKey.empty()) {
-        for(iterator->SeekToFirst(); iterator->Valid(); iterator->Next()) {
-            string tmpKey = iterator->key().ToString();
+        for(iterator->SeekToFirst(); iterator->IsValid(); iterator->Next()) {
+            string tmpKey = iterator->GetKey();
 
             if(tmpKey.empty()) {
                 continue;
             }
-            if(!fn(tmpKey, iterator->value().ToString())) {
+            if(!fn(tmpKey, iterator->GetValue())) {
                 break;
             }
 
@@ -137,18 +138,20 @@ storage::Status storage::StorageEngineImpl::Scan(const std::string &prefixKey,
             }
         }
     } else {
-        iterator->Seek(rocksdb::Slice(prefixKey));
+        iterator->Seek(prefixKey);
         string endStr = prefixKey;
         endStr.back() += 1;
-
-        rocksdb::Slice endSliceStr(endStr);
-        for(; iterator->Valid() && iterator->key().compare(endSliceStr) < 0; iterator->Next()) {
-            string tmpKey = iterator->key().ToString();
+        for(; iterator->IsValid(); iterator->Next()) {
+            string tmpKey = iterator->GetKey();
             if(tmpKey.empty()) {
                 continue;
             }
 
-            if(!fn(tmpKey, iterator->value().ToString())) {
+            if(tmpKey >= endStr) {
+                break;
+            }
+
+            if(!fn(tmpKey, iterator->GetValue())) {
                 break;
             }
             if(++limit > limit_) {

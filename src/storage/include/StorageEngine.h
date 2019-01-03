@@ -74,6 +74,7 @@ namespace storage {
         virtual void Seek(const string& target) = 0;
         virtual void SeekToFirst() = 0;
         virtual void SeekToLast() = 0;
+
     };
     typedef std::shared_ptr<Iterator> IteratorPtr;
 
