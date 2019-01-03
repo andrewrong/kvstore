@@ -33,17 +33,31 @@ storage::StorageEngineImpl::~StorageEngineImpl() {
 }
 
 storage::Status storage::StorageEngineImpl::Set(const std::string &key, const std::string &value) {
-    auto status = db_->Put(rocksdb::WriteOptions(), key, value);
+    if(key.empty()) {
+        int code = static_cast<int>(Code::eParamError);
+        return std::make_pair(code, CodeMsg[code]);
+    }
 
+    auto status = db_->Put(rocksdb::WriteOptions(), key, value);
     return std::make_pair(status.code(), CodeMsg[status.code()]);
 }
 
 storage::Status storage::StorageEngineImpl::Get(const std::string &key, std::string &value) {
+    if(key.empty()) {
+        int code = static_cast<int>(Code::eParamError);
+        return std::make_pair(code, CodeMsg[code]);
+    }
+
     auto status = db_->Get(rocksdb::ReadOptions(), key ,&value);
     return std::make_pair(status.code(), CodeMsg[status.code()]);
 }
 
 storage::Status storage::StorageEngineImpl::Del(const std::string &key) {
+    if(key.empty()) {
+        int code = static_cast<int>(Code::eParamError);
+        return std::make_pair(code, CodeMsg[code]);
+    }
+
     auto status = db_->Delete(rocksdb::WriteOptions(), key);
     return std::make_pair(status.code(), CodeMsg[status.code()]);
 }
@@ -51,8 +65,12 @@ storage::Status storage::StorageEngineImpl::Del(const std::string &key) {
 storage::Status storage::StorageEngineImpl::MultiSet(const std::map<std::string, std::string> &kv_map) {
     rocksdb::WriteBatch write_batch;
     for (auto it= kv_map.begin(); it != kv_map.end(); ++it) {
+        if(it->first.empty()){
+            continue;
+        }
         write_batch.Put(it->first, it->second);
     }
+
     rocksdb::Status status = db_->Write(rocksdb::WriteOptions(), &write_batch);
     int code = status.code();
     return std::make_pair(code, CodeMsg[code]);
@@ -62,6 +80,9 @@ storage::Status
 storage::StorageEngineImpl::MultiGet(const std::vector<std::string> &keys, std::vector<std::string> &values) {
     vector<rocksdb::Slice> rocksdbKeys;
     for(auto& key : keys) {
+        if(key.empty()) {
+            continue;
+        }
         rocksdbKeys.push_back(key);
     }
 
@@ -95,7 +116,7 @@ storage::Status storage::StorageEngineImpl::Scan(const std::string &prefixKey,
     rocksdb::Iterator* iterator = db_->NewIterator(rocksdb::ReadOptions());
     if (!iterator) {
         fprintf(stderr, "iterator is null");
-        int code = 15;
+        int code = static_cast<int>(Code::eInnerUnknownError);
         return std::make_pair(code, CodeMsg[code]);
     }
 

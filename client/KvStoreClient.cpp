@@ -6,7 +6,7 @@
 
 kvstore::KvStoreClient::KvStoreClient(const string &serverAddr) {
     if(serverAddr.empty()) {
-        fprintf(stderr, "server addr is null");
+        fprintf(stderr, "server addr is null\n");
         exit(-1);
     }
 
@@ -16,7 +16,7 @@ kvstore::KvStoreClient::KvStoreClient(const string &serverAddr) {
 
 bool kvstore::KvStoreClient::get(const string &key, string &value) {
     if(key.empty()) {
-        fprintf(stderr, "key is empty");
+        fprintf(stderr, "key is empty\n");
         return false;
     }
 
@@ -28,12 +28,12 @@ bool kvstore::KvStoreClient::get(const string &key, string &value) {
     Status sts = stub_->Get(&context, pKey, &response);
 
     if(!sts.ok()) {
-        fprintf(stderr, "grpc get is error");
+        fprintf(stderr, "grpc get is error\n");
         return false;
     }
 
     if(response.status().code() == 1001) {
-        fprintf(stdout, "get rpc is ok");
+        fprintf(stdout, "get rpc is ok\n");
         value = response.value().value();
 
         return true;
@@ -45,7 +45,7 @@ bool kvstore::KvStoreClient::get(const string &key, string &value) {
 
 bool kvstore::KvStoreClient::put(const string &key, const string &value) {
     if(key.empty()) {
-        fprintf(stderr, "key is empty");
+        fprintf(stderr, "key is empty\n");
         return false;
     }
 
@@ -65,12 +65,12 @@ bool kvstore::KvStoreClient::put(const string &key, const string &value) {
     Status sts = stub_->Put(&context, kvPair, &response);
 
     if(!sts.ok()) {
-        fprintf(stderr, "grpc get is error");
+        fprintf(stderr, "grpc get is error\n");
         return false;
     }
 
     if(response.code() == 1001) {
-        fprintf(stdout, "put rpc is ok");
+        fprintf(stdout, "put rpc is ok\n");
         return true;
     } else {
         fprintf(stderr, "put key %s value %s is error, msg:%s \n", key.c_str(), value.c_str(), response.msg().c_str());
@@ -95,10 +95,10 @@ kvstore::KvStoreClient::scan(const string &prefixKey, const std::function<void(c
 
     Status sts = reader->Finish();
     if (sts.ok()) {
-        fprintf(stdout, "scan is success");
+        fprintf(stdout, "scan is success\n");
         return true;
     } else {
-        fprintf(stderr, "scan key %s is error", prefixKey.c_str());
+        fprintf(stderr, "scan key %s is error\n", prefixKey.c_str());
         return false;
     }
 }

@@ -27,17 +27,21 @@ int main() {
     for(; i >= 0; --i) {
         string tmp = std::to_string(i);
         if(!client.put("key_" + tmp, "value_" + tmp)) {
-            cout << "key:" << tmp << " put is error";
+            cout << "key:" << tmp << " put is error" << endl;
         }
     }
 
     vector<std::pair<string, string>> result;
-    client.scan("key_", [&result](const string& key, const string& value) {
+    client.scan("", [&result](const string& key, const string& value) {
             if(key.empty()) {
                 return;
             }
             result.push_back(std::make_pair(key, value));
     });
+
+    for(auto& item : result) {
+        cout << item.first << ":" << item.second << endl;
+    }
     cout << result.size() << endl;
 
     string delKey = "delKey";
