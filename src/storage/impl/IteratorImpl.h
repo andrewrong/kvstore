@@ -8,11 +8,11 @@
 #include <rocksdb/iterator.h>
 
 namespace storage {
-    class iteratorImpl : public Iterator {
+    class IteratorImpl : public Iterator {
     public:
-        iteratorImpl(rocksdb::Iterator* iter);
+        IteratorImpl(rocksdb::Iterator* iter);
 
-        ~iteratorImpl() override;
+        ~IteratorImpl() override;
 
         bool IsValid() override;
 

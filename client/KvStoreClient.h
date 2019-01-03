@@ -29,7 +29,7 @@ namespace kvstore {
 
         bool get(const string& key, string& value);
         bool put(const string& key, const string& value);
-        bool scan(const string& prefixKey, std::function<void(const string& key, const string& value)>& fn);
+        bool scan(const string& prefixKey, const std::function<void(const string& key, const string& value)>& fn);
         bool del(const string& key);
 
     private:

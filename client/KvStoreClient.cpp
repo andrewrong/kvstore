@@ -79,7 +79,7 @@ bool kvstore::KvStoreClient::put(const string &key, const string &value) {
 }
 
 bool
-kvstore::KvStoreClient::scan(const string &prefixKey, std::function<void(const string &key, const string &value)> &fn) {
+kvstore::KvStoreClient::scan(const string &prefixKey, const std::function<void(const string &key, const string &value)> &fn) {
     ClientContext context;
     proto::Key pKey;
     pKey.set_key(prefixKey);

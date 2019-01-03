@@ -3,7 +3,7 @@
 //
 
 #include "StorageEngineImpl.h"
-#include "iteratorImpl.h"
+#include "IteratorImpl.h"
 
 storage::StorageEngineImpl::StorageEngineImpl(const string& dbPath) {
     rocksdb::Status status;
@@ -71,7 +71,7 @@ storage::StorageEngineImpl::MultiGet(const std::vector<std::string> &keys, std::
             return std::make_pair(item.code(), CodeMsg[item.code()]);
         }
     }
-    return std::make_pair(0, "0k");
+    return std::make_pair(0, CodeMsg[0]);
 }
 
 storage::IteratorPtr storage::StorageEngineImpl::NewIterator() {
@@ -79,7 +79,7 @@ storage::IteratorPtr storage::StorageEngineImpl::NewIterator() {
     if (!iterator) {
         return nullptr;
     }
-    IteratorPtr iteratorPtr = std::make_shared<iteratorImpl>(iterator);
+    IteratorPtr iteratorPtr = std::dynamic_pointer_cast<Iterator>(std::make_shared<IteratorImpl>(iterator));
     return iteratorPtr;
 }
 
